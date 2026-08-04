@@ -1,0 +1,16 @@
+{
+  "producer": "impactforge",
+  "version": "0.1.0",
+  "evidence_id": "adapter-impactforge-001",
+  "captured_at": "2026-08-04T21:10:00Z",
+  "system": "turtlebot-navigation",
+  "task": "navigate through pedestrian crossing",
+  "run_id": "if-run-003",
+  "scenario": "pedestrian-crossing",
+  "seed": 42,
+  "metrics": {
+    "baseline_clearance_m": 1.0,
+    "candidate_clearance_m": 0.7
+  },
+  "release_decision": "blocked"
+}

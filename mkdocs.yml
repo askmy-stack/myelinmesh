@@ -1,0 +1,18 @@
+site_name: MyelinMesh
+site_description: The reliability evidence mesh for AI systems
+repo_url: https://github.com/askmy-stack/MyelinMesh
+theme:
+  name: material
+nav:
+  - Home: index.md
+  - Architecture: architecture.md
+  - Evidence model: evidence-model.md
+  - Integrations: integration-contracts.md
+  - Dataset strategy: dataset-strategy.md
+  - Benchmark plan: benchmark-plan.md
+  - Security and privacy: security-privacy.md
+  - Brand: brand.md
+  - Name due diligence: name-due-diligence.md
+  - Decisions:
+      - Local-first store: adr/0001-local-first-store.md
+      - Evidence, not proof: adr/0002-evidence-not-proof.md

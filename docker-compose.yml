@@ -1,0 +1,7 @@
+services:
+  myelinmesh:
+    build: .
+    volumes:
+      - ./.myelinmesh:/data
+      - ./examples:/examples:ro
+    command: ["stats", "--store", "/data"]

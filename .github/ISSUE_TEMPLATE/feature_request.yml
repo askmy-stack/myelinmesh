@@ -1,0 +1,19 @@
+name: Feature request
+description: Propose a feature, adapter, or research extension
+title: "feat: "
+labels: [enhancement]
+body:
+  - type: textarea
+    attributes:
+      label: Problem
+      description: What reliability-evidence problem should this solve?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Proposed approach
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Alternatives and limitations

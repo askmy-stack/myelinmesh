@@ -1,0 +1,96 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "myelinmesh"
+version = "0.1.0"
+description = "Open-source reliability evidence mesh for AI systems"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "Apache-2.0"}
+authors = [
+  {name = "Abhinaysai Kamineni"}
+]
+keywords = [
+  "reliable-ai",
+  "ai-agents",
+  "physical-ai",
+  "provenance",
+  "evidence",
+  "failure-analysis"
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Typing :: Typed"
+]
+dependencies = [
+  "pydantic>=2.7,<3",
+  "typer>=0.16,<1",
+  "rich>=13.7,<16"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2,<10",
+  "pytest-cov>=5,<8",
+  "ruff>=0.12,<1",
+  "mypy>=1.10,<2",
+  "pre-commit>=4,<5"
+]
+docs = [
+  "mkdocs-material>=9.5,<10"
+]
+
+[project.scripts]
+myelinmesh = "myelinmesh.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/askmy-stack/MyelinMesh"
+Repository = "https://github.com/askmy-stack/MyelinMesh"
+Issues = "https://github.com/askmy-stack/MyelinMesh/issues"
+Documentation = "https://github.com/askmy-stack/MyelinMesh/tree/main/docs"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+myelinmesh = ["py.typed"]
+
+[tool.pytest.ini_options]
+addopts = "-q --strict-markers --disable-warnings"
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.11"
+packages = ["myelinmesh"]
+check_untyped_defs = true
+disallow_untyped_defs = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+no_implicit_optional = true
+
+[tool.coverage.run]
+source = ["myelinmesh"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true

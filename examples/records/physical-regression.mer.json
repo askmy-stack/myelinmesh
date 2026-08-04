@@ -1,0 +1,97 @@
+{
+  "schema_version": "0.1.0",
+  "identity": {
+    "evidence_id": "mer-demo-physical-regression-001",
+    "project": "impactforge",
+    "captured_at": "2026-08-04T19:00:00Z"
+  },
+  "provenance": {
+    "source_type": "simulation",
+    "producer": "impactforge",
+    "producer_version": "0.1.0",
+    "repository_url": "https://github.com/askmy-stack/impactforge",
+    "commit_sha": "b82d91",
+    "environment": {
+      "simulator": "Gazebo Harmonic",
+      "ros_distribution": "Jazzy"
+    }
+  },
+  "context": {
+    "domain": "physical_ai",
+    "system": "warehouse-mobile-robot",
+    "task": "Navigate through a low-light pedestrian crossing",
+    "environment": "warehouse-v2"
+  },
+  "change": {
+    "change_type": "configuration",
+    "artifact": "nav2_params.yaml",
+    "summary": "Maximum linear velocity increased from 0.45 to 0.65 m/s.",
+    "before_hash": "111111",
+    "after_hash": "222222",
+    "metadata": {
+      "parameter": "max_vel_x",
+      "before": 0.45,
+      "after": 0.65
+    }
+  },
+  "execution": {
+    "run_id": "impactforge-run-017",
+    "scenario": "pedestrian-crossing-low-light",
+    "model": "nav2-controller",
+    "seed": 4821,
+    "tools": [],
+    "artifacts": [
+      {
+        "uri": "artifacts/impactforge-run-017/recording.mcap",
+        "media_type": "application/x-mcap",
+        "description": "Synthetic demo MCAP reference"
+      }
+    ]
+  },
+  "observations": {
+    "baseline_minimum_clearance_m": 1.18,
+    "candidate_minimum_clearance_m": 0.69,
+    "minimum_allowed_clearance_m": 0.8,
+    "collision": false,
+    "release_decision": "blocked"
+  },
+  "failure": {
+    "detected": true,
+    "failure_class": "physical_behavior_regression",
+    "severity": "critical",
+    "confidence": 0.99,
+    "supported_by": [
+      "candidate clearance fell below the declared threshold"
+    ]
+  },
+  "diagnosis": {
+    "method": "baseline-candidate controlled simulation",
+    "supported_facts": [
+      "The candidate produced lower pedestrian clearance under the same seed."
+    ],
+    "hypotheses": [
+      "Higher commanded velocity increased stopping distance."
+    ],
+    "unsupported_hypotheses": [],
+    "confidence": 0.83
+  },
+  "recovery": null,
+  "validation": {
+    "human_reviewed": false,
+    "reviewer": null,
+    "replay_count": 5,
+    "reproduced_count": 5,
+    "real_or_synthetic": "simulation",
+    "notes": [
+      "Synthetic demonstration record; not evidence of hardware safety."
+    ]
+  },
+  "tags": [
+    "impactforge",
+    "physical-ai",
+    "navigation",
+    "simulation"
+  ],
+  "related_evidence_ids": [],
+  "content_hash": null
+}

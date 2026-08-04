@@ -1,0 +1,16 @@
+{
+  "producer": "tool-semantics",
+  "version": "0.1.0",
+  "evidence_id": "adapter-tool-semantics-001",
+  "captured_at": "2026-08-04T21:00:00Z",
+  "system": "github-agent",
+  "artifact": "github-tools-v2.json",
+  "is_compatible": false,
+  "changes": [
+    {
+      "code": "parameter.added_required",
+      "severity": "breaking",
+      "subject": "create_issue.repository"
+    }
+  ]
+}

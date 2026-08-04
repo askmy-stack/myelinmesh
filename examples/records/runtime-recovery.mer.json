@@ -1,0 +1,92 @@
+{
+  "schema_version": "0.1.0",
+  "identity": {
+    "evidence_id": "mer-demo-runtime-recovery-001",
+    "project": "parallax",
+    "captured_at": "2026-08-04T20:00:00Z"
+  },
+  "provenance": {
+    "source_type": "benchmark",
+    "producer": "parallax",
+    "producer_version": "0.1.0",
+    "repository_url": "https://github.com/askmy-stack/parallax",
+    "commit_sha": "c31e08",
+    "environment": {
+      "case": "stale-memory-001"
+    }
+  },
+  "context": {
+    "domain": "agent",
+    "system": "customer-support-agent",
+    "task": "Update a customer plan using current account state",
+    "environment": "controlled failure benchmark"
+  },
+  "change": null,
+  "execution": {
+    "run_id": "parallax-exp-091",
+    "scenario": "stale-memory-001",
+    "model": "scripted-baseline",
+    "seed": 7,
+    "tools": [
+      "get_account",
+      "update_plan"
+    ],
+    "artifacts": []
+  },
+  "observations": {
+    "memory_plan": "basic",
+    "live_plan": "premium",
+    "first_detected_step": 4,
+    "transport_errors": 0
+  },
+  "failure": {
+    "detected": true,
+    "failure_class": "stale_memory",
+    "severity": "breaking",
+    "confidence": 0.97,
+    "supported_by": [
+      "memory state disagreed with the live account state"
+    ]
+  },
+  "diagnosis": {
+    "method": "semantic state comparison",
+    "supported_facts": [
+      "The live account plan was premium while memory stated basic."
+    ],
+    "hypotheses": [
+      "The agent consumed stale episodic memory."
+    ],
+    "unsupported_hypotheses": [
+      "The update API was unavailable."
+    ],
+    "confidence": 0.94
+  },
+  "recovery": {
+    "action": "rollback_memory_and_refresh_live_state",
+    "successful": true,
+    "outcome": "The agent selected the correct update path after refresh.",
+    "applicable_conditions": {
+      "failure_class": "stale_memory"
+    },
+    "negative_evidence": [
+      "Retrying the original plan without refreshing state failed."
+    ]
+  },
+  "validation": {
+    "human_reviewed": true,
+    "reviewer": "demo-reviewer",
+    "replay_count": 10,
+    "reproduced_count": 10,
+    "real_or_synthetic": "benchmark",
+    "notes": [
+      "Synthetic benchmark fixture."
+    ]
+  },
+  "tags": [
+    "parallax",
+    "stale-memory",
+    "recovery"
+  ],
+  "related_evidence_ids": [],
+  "content_hash": null
+}

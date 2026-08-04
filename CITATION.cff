@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use MyelinMesh in research, please cite the software release."
+title: "MyelinMesh: A reliability evidence mesh for AI systems"
+type: software
+authors:
+  - family-names: "Kamineni"
+    given-names: "Abhinaysai"
+    alias: "askmy-stack"
+repository-code: "https://github.com/askmy-stack/MyelinMesh"
+license: "Apache-2.0"
+version: "0.1.0"
+date-released: "2026-08-04"
+keywords:
+  - reliable AI
+  - AI agents
+  - physical AI
+  - evidence
+  - provenance
+  - failure analysis

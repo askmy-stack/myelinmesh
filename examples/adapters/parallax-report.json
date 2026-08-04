@@ -1,0 +1,31 @@
+{
+  "producer": "parallax",
+  "version": "0.1.0",
+  "evidence_id": "adapter-parallax-001",
+  "captured_at": "2026-08-04T21:20:00Z",
+  "domain": "agent",
+  "system": "support-agent",
+  "task": "resolve customer request",
+  "trace": [],
+  "signals": {
+    "semantic_mismatch": 0.92
+  },
+  "failure": {
+    "detected": true,
+    "class": "semantic_tool_drift",
+    "severity": "breaking",
+    "confidence": 0.92,
+    "supported_by": ["expected and observed tool meanings diverged"]
+  },
+  "diagnosis": {
+    "method": "semantic trace comparison",
+    "supported_facts": ["tool returned a changed enum meaning"],
+    "hypotheses": ["server contract changed"],
+    "confidence": 0.81
+  },
+  "recovery": {
+    "action": "refresh_tool_contract",
+    "successful": true,
+    "outcome": "task completed after contract refresh"
+  }
+}
