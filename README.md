@@ -12,25 +12,20 @@ MyelinMesh is an open-source evidence layer that connects software and model cha
 The name draws from biological **myelin**, which insulates and accelerates signals, and a **mesh**, which links evidence across otherwise isolated systems. MyelinMesh does not certify safety or prove causality. It preserves provenance, exposes uncertainty, and makes reliability claims testable.
 
 <picture>
-  <source media="(prefers-reduced-motion: reduce)" srcset="docs/assets/myelinmesh-cli-demo-static.png">
-  <img src="docs/assets/myelinmesh-cli-demo.gif" alt="Three-step MyelinMesh CLI workflow: initialize a local store, ingest a validated evidence record, then search for semantic drift" width="840">
+  <source media="(prefers-reduced-motion: reduce)" srcset="docs/assets/myelinmesh-evidence-flow-static.png">
+  <img src="docs/assets/myelinmesh-evidence-flow.gif" alt="MyelinMesh evidence flow: Tool-Semantics, ImpactForge, and Parallax reports pass through adapters, schema validation, and canonical hashing into MER JSON records and a SQLite metadata index, then become available through CLI list, show, search, and stats commands" width="840">
 </picture>
 
-<p align="center"><em>From fragmented reliability signals to searchable, provenance-aware evidence.</em></p>
+<p align="center"><em>Supported v0.1 path: reports → validated MER → local JSON/SQLite → CLI.</em></p>
 
 <details>
-<summary>Accessible text version of the demo</summary>
+<summary>Text version of the evidence flow</summary>
 
-```console
-$ myelinmesh init .myelinmesh
-Initialized MyelinMesh store at .myelinmesh
-
-$ myelinmesh ingest examples/records/tool-semantic-drift.mer.json --store .myelinmesh
-Ingested mer-demo-tool-drift-001 into .myelinmesh
-
-$ myelinmesh search "semantic drift" --store .myelinmesh
-mer-demo-tool-drift-001 · tool-semantics · critical · confidence 0.91
-```
+1. Tool-Semantics, ImpactForge, and Parallax reports enter through their supported adapters.
+2. Pydantic and JSON Schema validate each MyelinMesh Evidence Record (MER).
+3. Canonical JSON produces a SHA-256 content hash.
+4. MER JSON files and SQLite metadata are written under `.myelinmesh/`.
+5. The CLI retrieves evidence with `list`, `show`, `search`, and `stats`.
 
 </details>
 
@@ -48,10 +43,8 @@ MyelinMesh gives these artifacts a shared record format and a local-first store 
 
 ```text
 Tool-Semantics ─┐
-ImpactForge ─────┼──► MyelinMesh Evidence Records ─► search, compare, rank, reuse
-Parallax ────────┤
-ROS 2 / MCAP ────┤
-OpenTelemetry ───┘
+ImpactForge ─────┼──► validate + hash ─► MER JSON + SQLite ─► list · show · search · stats
+Parallax ────────┘
 ```
 
 ## Initial capabilities
@@ -186,7 +179,7 @@ docker compose run --rm myelinmesh --help
 
 The repository ships with Ruff, mypy, pytest with branch coverage, pre-commit hooks, schema drift detection, multi-version CI, CodeQL, and Dependabot configuration.
 
-Regenerate the README demo and its reduced-motion fallback with:
+Regenerate the README evidence flow and its reduced-motion fallback with:
 
 ```bash
 pip install -e ".[media]"
