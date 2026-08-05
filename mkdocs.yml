@@ -16,3 +16,4 @@ nav:
   - Decisions:
       - Local-first store: adr/0001-local-first-store.md
       - Evidence, not proof: adr/0002-evidence-not-proof.md
+      - MER compatibility policy: adr/0003-mer-compatibility-policy.md

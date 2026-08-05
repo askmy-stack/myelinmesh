@@ -73,6 +73,11 @@ The `schema_version` follows semantic versioning:
 - Minor: backward-compatible optional fields or enum additions
 - Major: incompatible field or semantic changes
 
+The full compatibility matrix, migration invariants, supported version window,
+and failure behavior are defined in [ADR 0003](adr/0003-mer-compatibility-policy.md).
+Consumers must fail closed for unknown major versions and must never treat a
+successful migration as proof that the underlying evidence is true.
+
 ## File naming
 
 Recommended extension:
