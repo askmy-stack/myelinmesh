@@ -1,4 +1,4 @@
-.PHONY: install test lint format typecheck schema demo clean
+.PHONY: install test lint format typecheck schema release-gate benchmark demo clean
 
 install:
 	python -m pip install -e ".[dev]"
@@ -19,6 +19,12 @@ typecheck:
 
 schema:
 	python scripts/export_schema.py
+
+release-gate:
+	python scripts/release_gate.py
+
+benchmark:
+	python scripts/benchmark_local.py
 
 demo:
 	rm -rf .myelinmesh-demo

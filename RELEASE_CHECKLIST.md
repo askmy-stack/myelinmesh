@@ -14,6 +14,8 @@ this documentation PR does not create a tag or publish a package.
 - [ ] `mypy src` passes
 - [ ] generated JSON Schema is unchanged after regeneration
 - [ ] examples validate and demo succeeds
+- [ ] `make release-gate` passes
+- [ ] `make benchmark` meets the published local baseline
 
 ## Compatibility
 
