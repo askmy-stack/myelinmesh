@@ -8,7 +8,9 @@ from myelinmesh.models import EvidenceRecord
 
 
 def canonical_payload(record: EvidenceRecord) -> bytes:
-    data: dict[str, Any] = record.model_dump(mode="json", exclude={"content_hash"}, by_alias=True)
+    data: dict[str, Any] = record.model_dump(
+        mode="json", exclude={"content_hash", "signature"}, by_alias=True
+    )
     return json.dumps(data, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode(
         "utf-8"
     )

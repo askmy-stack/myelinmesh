@@ -56,7 +56,18 @@ Records human review, replay counts, reproduction counts, synthetic/real status,
 
 ## Content hash
 
-The SDK calculates a SHA-256 hash over canonical JSON while excluding the `content_hash` field. The hash detects accidental mutation; it is not a digital signature.
+The SDK calculates a SHA-256 hash over canonical JSON while excluding the
+`content_hash` and `signature` fields. The hash detects accidental mutation;
+it is not a digital signature.
+
+## Signed provenance
+
+Records may carry a provider-neutral `signature` envelope containing an
+algorithm, key identifier, signature bytes, and timestamp. The reference
+implementation offers local HMAC-SHA-256 signing for controlled workflows.
+Production deployments should use a KMS/HSM or asymmetric provider; private
+keys must never be serialized into a record, log, or artifact. A valid
+signature authenticates the signed payload, not the truth of its claims.
 
 ## Severity vocabulary
 

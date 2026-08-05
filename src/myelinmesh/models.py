@@ -174,6 +174,15 @@ class ValidationEvidence(StrictModel):
         return value
 
 
+class SignatureEnvelope(StrictModel):
+    """Provider-neutral signature metadata; private keys never belong in a MER."""
+
+    algorithm: str = Field(pattern=r"^[a-z0-9][a-z0-9._-]*$")
+    key_id: str = Field(min_length=1, max_length=200)
+    signature: str = Field(pattern=r"^[a-fA-F0-9]+$")
+    created_at: datetime
+
+
 class EvidenceRecord(StrictModel):
     schema_version: str = Field(default="0.1.0", pattern=r"^\d+\.\d+\.\d+$")
     identity: Identity
@@ -188,4 +197,5 @@ class EvidenceRecord(StrictModel):
     validation: ValidationEvidence = Field(default_factory=ValidationEvidence)
     tags: list[str] = Field(default_factory=list)
     related_evidence_ids: list[str] = Field(default_factory=list)
+    signature: SignatureEnvelope | None = None
     content_hash: str | None = Field(default=None, pattern=r"^sha256:[a-f0-9]{64}$")
