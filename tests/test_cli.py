@@ -58,3 +58,21 @@ def test_cli_batch_ingest_json_summary(tmp_path: Path) -> None:
     assert result.exit_code == 0
     assert '"inserted": 3' in result.stdout
     assert '"duplicates": 0' in result.stdout
+
+
+def test_cli_migrate_writes_a_new_file(tmp_path: Path) -> None:
+    output = tmp_path / "migrated.mer.json"
+    result = runner.invoke(
+        app,
+        [
+            "migrate",
+            "examples/records/tool-semantic-drift.mer.json",
+            "--to",
+            "0.1.0",
+            "--output",
+            str(output),
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert output.exists()

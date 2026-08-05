@@ -13,6 +13,7 @@ from myelinmesh.adapters import MyelinMeshAdapter, ParallaxAdapter, ToolSemantic
 from myelinmesh.adapters.base import EvidenceAdapter
 from myelinmesh.hashing import compute_content_hash, verify_content_hash
 from myelinmesh.io import EvidenceFileError, read_record, write_record
+from myelinmesh.migrations import MigrationError, migrate_record
 from myelinmesh.store import EvidenceStore, EvidenceSummary
 
 app = typer.Typer(
@@ -65,6 +66,37 @@ def validate(
     console.print(f"Valid MER: [bold]{record.identity.evidence_id}[/bold]")
     console.print(f"Computed hash: {digest}")
     console.print(f"Stored hash: {hash_status}")
+
+
+@app.command()
+def migrate(
+    record_file: Annotated[Path, typer.Argument(exists=True, readable=True)],
+    target_version: Annotated[str, typer.Option("--to", help="Target MER schema version.")],
+    output: Annotated[Path | None, typer.Option("--output", help="Destination MER file.")] = None,
+    in_place: Annotated[
+        bool, typer.Option("--in-place", help="Replace the input file explicitly.")
+    ] = False,
+) -> None:
+    """Migrate one MER record through the registered compatibility path."""
+    if output is not None and in_place:
+        raise typer.BadParameter("Use either --output or --in-place, not both.")
+    destination = (
+        record_file
+        if in_place
+        else output
+        if output is not None
+        else record_file.with_name(f"{record_file.stem}.migrated-{target_version}.mer.json")
+    )
+    if destination == record_file and not in_place:
+        raise typer.BadParameter("Output must differ from input unless --in-place is used.")
+    try:
+        record = read_record(record_file)
+        migrated = migrate_record(record, target_version)
+        write_record(migrated, destination)
+    except (EvidenceFileError, MigrationError, OSError) as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(code=2) from exc
+    console.print(f"Migrated {record_file} -> {destination} ({target_version})")
 
 
 @app.command()

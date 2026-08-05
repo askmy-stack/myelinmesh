@@ -86,6 +86,7 @@ The demo creates an isolated `.myelinmesh-demo` store, ingests all three include
 | --- | --- |
 | `myelinmesh init PATH` | Create a local evidence store and SQLite index. |
 | `myelinmesh validate RECORD` | Validate an MER JSON document without ingesting it. |
+| `myelinmesh migrate RECORD --to VERSION` | Write a deterministic record migration to a new file. |
 | `myelinmesh ingest RECORD --store PATH` | Validate, hash, and persist evidence. |
 | `myelinmesh ingest-batch PATH... --store PATH` | Deterministically ingest files or directories and report inserts, duplicates, invalid records, and failures. |
 | `myelinmesh list --store PATH` | List indexed evidence records. |
@@ -93,6 +94,11 @@ The demo creates an isolated `.myelinmesh-demo` store, ingests all three include
 | `myelinmesh show ID --store PATH` | Inspect one evidence record. |
 | `myelinmesh stats --store PATH` | Summarize the local evidence collection. |
 | `myelinmesh adapt PRODUCER REPORT` | Convert supported producer output into an MER record. |
+
+Migration paths are explicit and registered in `myelinmesh.migrations`. Each
+path must validate its output, preserve evidence identity and provenance, and
+remain deterministic. Unsupported target versions fail closed; the CLI never
+silently edits the input unless `--in-place` is requested.
 
 ## Example evidence record
 
