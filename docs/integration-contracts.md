@@ -63,3 +63,11 @@ class EvidenceAdapter(Protocol):
 ```
 
 An adapter must not silently fabricate missing provenance. Unknown values should remain absent or explicitly unknown.
+## Offline interoperability adapters
+
+The CLI can convert saved, sanitized payloads from OpenTelemetry, GitHub pull
+requests/events, and ROS 2/MCAP metadata with `myelinmesh adapt`. These
+adapters are deterministic and dependency-light: they do not contact a
+collector, GitHub, or a ROS graph, and they never read credentials. Network
+collection remains the responsibility of the producer that created the input
+JSON; the resulting MER keeps only evidence and artifact references.
