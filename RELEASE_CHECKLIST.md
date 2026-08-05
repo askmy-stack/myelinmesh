@@ -11,8 +11,10 @@
 
 ## Compatibility
 
-- [ ] schema change classified as patch, minor, or major
-- [ ] migrations documented when needed
+- [ ] schema change classified as patch, minor, or major using ADR 0003
+- [ ] reader and writer behavior for older, newer, and unknown versions tested
+- [ ] migration invariants (determinism, idempotency, provenance preservation, no silent data loss) verified
+- [ ] migrations documented and linked from release notes when needed
 - [ ] adapters tested against representative producer outputs
 
 ## Security and data
