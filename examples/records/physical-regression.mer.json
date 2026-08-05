@@ -2,14 +2,14 @@
   "schema_version": "0.1.0",
   "identity": {
     "evidence_id": "mer-demo-physical-regression-001",
-    "project": "impactforge",
+    "project": "myelinmesh",
     "captured_at": "2026-08-04T19:00:00Z"
   },
   "provenance": {
     "source_type": "simulation",
-    "producer": "impactforge",
+    "producer": "myelinmesh",
     "producer_version": "0.1.0",
-    "repository_url": "https://github.com/askmy-stack/impactforge",
+    "repository_url": "https://github.com/askmy-stack/MyelinMesh",
     "commit_sha": "b82d91",
     "environment": {
       "simulator": "Gazebo Harmonic",
@@ -35,14 +35,14 @@
     }
   },
   "execution": {
-    "run_id": "impactforge-run-017",
+    "run_id": "myelinmesh-run-017",
     "scenario": "pedestrian-crossing-low-light",
     "model": "nav2-controller",
     "seed": 4821,
     "tools": [],
     "artifacts": [
       {
-        "uri": "artifacts/impactforge-run-017/recording.mcap",
+        "uri": "artifacts/myelinmesh-run-017/recording.mcap",
         "media_type": "application/x-mcap",
         "description": "Synthetic demo MCAP reference"
       }
@@ -87,7 +87,7 @@
     ]
   },
   "tags": [
-    "impactforge",
+    "myelinmesh",
     "physical-ai",
     "navigation",
     "simulation"

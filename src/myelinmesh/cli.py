@@ -9,7 +9,7 @@ from rich.console import Console
 from rich.table import Table
 
 from myelinmesh import __version__
-from myelinmesh.adapters import ImpactForgeAdapter, ParallaxAdapter, ToolSemanticsAdapter
+from myelinmesh.adapters import MyelinMeshAdapter, ParallaxAdapter, ToolSemanticsAdapter
 from myelinmesh.adapters.base import EvidenceAdapter
 from myelinmesh.hashing import compute_content_hash, verify_content_hash
 from myelinmesh.io import EvidenceFileError, read_record, write_record
@@ -91,7 +91,7 @@ def ingest(
 @app.command()
 def adapt(
     producer: Annotated[
-        str, typer.Argument(help="Producer: tool-semantics, impactforge, or parallax.")
+        str, typer.Argument(help="Producer: tool-semantics, myelinmesh, or parallax.")
     ],
     input_file: Annotated[Path, typer.Argument(exists=True, readable=True)],
     output_dir: Annotated[Path, typer.Option("--output-dir")] = Path("converted-evidence"),
@@ -99,7 +99,7 @@ def adapt(
     """Convert a supported producer report into MER records."""
     adapters: dict[str, EvidenceAdapter] = {
         "tool-semantics": ToolSemanticsAdapter(),
-        "impactforge": ImpactForgeAdapter(),
+        "myelinmesh": MyelinMeshAdapter(),
         "parallax": ParallaxAdapter(),
     }
     adapter = adapters.get(producer)

@@ -14,7 +14,7 @@ Prepared: 2026-08-04
 - Ruff linting and formatting checks pass.
 - mypy reports no issues across all 12 source files.
 - CLI smoke tests completed for initialization, validation, ingestion, search, statistics, and adapter conversion.
-- The demo ingested Tool-Semantics, ImpactForge, and Parallax records successfully.
+- The demo ingested Tool-Semantics, MyelinMesh, and Parallax records successfully.
 - Editable installation was tested in a clean Python 3.13 virtual environment.
 - MkDocs builds successfully in strict mode.
 - Docker Compose configuration and the Python 3.12 container image build successfully.
