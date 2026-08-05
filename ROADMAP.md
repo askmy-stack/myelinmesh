@@ -19,12 +19,12 @@ the remaining v0.2 work is tracked in GitHub milestone issues.
 
 - [x] Formal schema compatibility policy
 - [x] Schema migration command
-- [ ] OpenTelemetry trace adapter
-- [ ] GitHub change and pull-request adapter
-- [ ] ROS 2/MCAP metadata adapter
-- [ ] Artifact manifests with checksums and media types
+- [x] OpenTelemetry trace adapter
+- [x] GitHub change and pull-request adapter
+- [x] ROS 2/MCAP metadata adapter
+- [x] Artifact manifests with checksums and media types
 - [x] Batch ingestion and deduplication
-- [ ] Signed provenance envelopes
+- [x] Signed provenance envelopes
 
 ## v0.3.0 — Evidence retrieval
 

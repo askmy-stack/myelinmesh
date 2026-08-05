@@ -1,5 +1,11 @@
 # Release Checklist
 
+## v0.2.0 release candidate
+
+The interoperability implementation is complete in merged PRs #28–#31.
+This checklist tracks the remaining human-reviewed publication steps; merging
+this documentation PR does not create a tag or publish a package.
+
 ## Quality
 
 - [ ] `pytest` passes
@@ -15,7 +21,7 @@
 - [ ] reader and writer behavior for older, newer, and unknown versions tested
 - [ ] migration invariants (determinism, idempotency, provenance preservation, no silent data loss) verified
 - [ ] migrations documented and linked from release notes when needed
-- [ ] adapters tested against representative producer outputs
+- [x] adapters tested against representative producer outputs
 
 ## Security and data
 
