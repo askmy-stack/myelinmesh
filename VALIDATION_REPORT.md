@@ -1,6 +1,19 @@
 # Starter Repository Validation Report
 
-Prepared: 2026-08-04
+Prepared: 2026-08-05
+
+## v0.2.0 integration handoff
+
+The eight action items were implemented as eight reviewable PRs. PRs #28–#33
+and #41 are merged; this final handoff PR records the integrated validation
+state. The repository remains on package version 0.1.0 until the separately
+reviewed publication checklist is completed.
+
+- Artifact manifests, three interoperability adapters, signed provenance,
+  release automation, and the v0.3 retrieval plan are present on `main`.
+- GitHub issues #34–#40 now track the seven v0.3 retrieval slices.
+- No tag, package publication, or external deployment is performed by this
+  handoff.
 
 ## Completed checks
 
@@ -9,10 +22,10 @@ Prepared: 2026-08-04
 - All YAML files parse successfully.
 - `pyproject.toml` parses successfully.
 - The Pydantic model generated the committed JSON Schema.
-- Pytest result: **12 passed**.
+- Pytest result: **28 passed**.
 - Test coverage: **86%** with branch measurement enabled.
 - Ruff linting and formatting checks pass.
-- mypy reports no issues across all 12 source files.
+- mypy reports no issues across all 17 source files.
 - CLI smoke tests completed for initialization, validation, ingestion, search, statistics, and adapter conversion.
 - The demo ingested Tool-Semantics, MyelinMesh, and Parallax records successfully.
 - Editable installation was tested in a clean Python 3.13 virtual environment.
