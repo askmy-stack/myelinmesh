@@ -28,7 +28,7 @@
 - Typer/Rich command-line interface
 - Generated JSON Schema under `schemas/`
 - Example evidence and producer reports under `examples/`
-- Animated CLI walkthrough under `docs/assets/`
+- Animated evidence-flow overview under `docs/assets/`
 - Deterministic README demo renderer under `scripts/`
 - Pytest suite under `tests/`
 
