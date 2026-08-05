@@ -11,11 +11,28 @@ MyelinMesh is an open-source evidence layer that connects software and model cha
 
 The name draws from biological **myelin**, which insulates and accelerates signals, and a **mesh**, which links evidence across otherwise isolated systems. MyelinMesh does not certify safety or prove causality. It preserves provenance, exposes uncertainty, and makes reliability claims testable.
 
-<p align="center">
-  <img src="docs/assets/myelinmesh-cli-demo.gif" alt="MyelinMesh CLI initializing a store, validating and ingesting evidence, then reporting statistics" width="900">
-</p>
+<picture>
+  <source media="(prefers-reduced-motion: reduce)" srcset="docs/assets/myelinmesh-cli-demo-static.png">
+  <img src="docs/assets/myelinmesh-cli-demo.gif" alt="Three-step MyelinMesh CLI workflow: initialize a local store, ingest a validated evidence record, then search for semantic drift" width="840">
+</picture>
 
 <p align="center"><em>From fragmented reliability signals to searchable, provenance-aware evidence.</em></p>
+
+<details>
+<summary>Accessible text version of the demo</summary>
+
+```console
+$ myelinmesh init .myelinmesh
+Initialized MyelinMesh store at .myelinmesh
+
+$ myelinmesh ingest examples/records/tool-semantic-drift.mer.json --store .myelinmesh
+Ingested mer-demo-tool-drift-001 into .myelinmesh
+
+$ myelinmesh search "semantic drift" --store .myelinmesh
+mer-demo-tool-drift-001 · tool-semantics · critical · confidence 0.91
+```
+
+</details>
 
 ## Why this exists
 
@@ -168,6 +185,13 @@ docker compose run --rm myelinmesh --help
 ```
 
 The repository ships with Ruff, mypy, pytest with branch coverage, pre-commit hooks, schema drift detection, multi-version CI, CodeQL, and Dependabot configuration.
+
+Regenerate the README demo and its reduced-motion fallback with:
+
+```bash
+pip install -e ".[media]"
+python scripts/render_readme_demo.py
+```
 
 ## Non-goals
 

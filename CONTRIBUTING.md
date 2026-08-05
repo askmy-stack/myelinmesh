@@ -33,6 +33,18 @@ mypy src
 - Preserve uncertainty rather than presenting inferred diagnoses as facts.
 - Update `CHANGELOG.md` for user-visible changes.
 
+## Merge readiness
+
+The protected `main` branch requires every Python CI job and requires the PR branch to include the latest `main`. If GitHub reports that a PR is behind, update it before merging:
+
+```bash
+git fetch origin
+git rebase origin/main
+git push --force-with-lease
+```
+
+For an untouched Dependabot PR, comment `@dependabot rebase` instead. If `main` already contains the same dependency update, close the redundant PR rather than resolving an artificial conflict.
+
 ## Schema changes
 
 Schema fields cannot be renamed or removed in a minor release. Breaking changes require:
