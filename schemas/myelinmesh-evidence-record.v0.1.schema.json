@@ -607,6 +607,41 @@
       "title": "Severity",
       "type": "string"
     },
+    "SignatureEnvelope": {
+      "additionalProperties": false,
+      "description": "Provider-neutral signature metadata; private keys never belong in a MER.",
+      "properties": {
+        "algorithm": {
+          "pattern": "^[a-z0-9][a-z0-9._-]*$",
+          "title": "Algorithm",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "key_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Key Id",
+          "type": "string"
+        },
+        "signature": {
+          "pattern": "^[a-fA-F0-9]+$",
+          "title": "Signature",
+          "type": "string"
+        }
+      },
+      "required": [
+        "algorithm",
+        "key_id",
+        "signature",
+        "created_at"
+      ],
+      "title": "SignatureEnvelope",
+      "type": "object"
+    },
     "SourceType": {
       "enum": [
         "real",
@@ -770,6 +805,17 @@
       "pattern": "^\\d+\\.\\d+\\.\\d+$",
       "title": "Schema Version",
       "type": "string"
+    },
+    "signature": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SignatureEnvelope"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     },
     "tags": {
       "items": {
