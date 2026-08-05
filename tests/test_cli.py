@@ -40,3 +40,21 @@ def test_cli_adapter(tmp_path: Path) -> None:
     )
     assert result.exit_code == 0
     assert (output / "adapter-tool-semantics-001.mer.json").exists()
+
+
+def test_cli_batch_ingest_json_summary(tmp_path: Path) -> None:
+    store = tmp_path / "mesh"
+    result = runner.invoke(
+        app,
+        [
+            "ingest-batch",
+            "examples/records",
+            "--store",
+            str(store),
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert '"inserted": 3' in result.stdout
+    assert '"duplicates": 0' in result.stdout

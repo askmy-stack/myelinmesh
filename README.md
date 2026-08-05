@@ -87,6 +87,7 @@ The demo creates an isolated `.myelinmesh-demo` store, ingests all three include
 | `myelinmesh init PATH` | Create a local evidence store and SQLite index. |
 | `myelinmesh validate RECORD` | Validate an MER JSON document without ingesting it. |
 | `myelinmesh ingest RECORD --store PATH` | Validate, hash, and persist evidence. |
+| `myelinmesh ingest-batch PATH... --store PATH` | Deterministically ingest files or directories and report inserts, duplicates, invalid records, and failures. |
 | `myelinmesh list --store PATH` | List indexed evidence records. |
 | `myelinmesh search QUERY --store PATH` | Search evidence using indexed text and metadata. |
 | `myelinmesh show ID --store PATH` | Inspect one evidence record. |
