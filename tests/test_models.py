@@ -7,7 +7,7 @@ import pytest
 from pydantic import ValidationError
 
 from myelinmesh.hashing import compute_content_hash, verify_content_hash, with_content_hash
-from myelinmesh.models import EvidenceRecord
+from myelinmesh.models import ArtifactReference, EvidenceRecord
 
 EXAMPLES = Path("examples/records")
 
@@ -32,3 +32,34 @@ def test_reproduction_count_cannot_exceed_replays() -> None:
     payload["validation"]["reproduced_count"] = 3
     with pytest.raises(ValidationError):
         EvidenceRecord.model_validate(payload)
+
+
+def test_artifact_manifest_supports_explicit_checksum() -> None:
+    digest = "a" * 64
+    artifact = ArtifactReference(
+        uri="s3://bucket/run-42/result.mcap",
+        media_type="application/vnd.mcap",
+        size_bytes=4096,
+        checksum_algorithm="sha256",
+        checksum=digest,
+    )
+    assert artifact.canonical_checksum == ("sha256", digest)
+
+
+def test_artifact_manifest_preserves_legacy_sha256() -> None:
+    digest = "b" * 64
+    artifact = ArtifactReference(uri="file:///tmp/result.json", sha256=digest)
+    assert artifact.canonical_checksum == ("sha256", digest)
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"checksum": "a" * 64},
+        {"checksum_algorithm": "sha256", "checksum": "a" * 63},
+        {"sha256": "a" * 64, "checksum_algorithm": "md5", "checksum": "b" * 32},
+    ],
+)
+def test_artifact_manifest_rejects_ambiguous_checksums(kwargs: dict[str, str]) -> None:
+    with pytest.raises(ValidationError):
+        ArtifactReference(uri="file:///tmp/result", **kwargs)

@@ -24,6 +24,16 @@ Optionally describes a software, model, prompt, tool, configuration, firmware, o
 
 Identifies the run, scenario, model, seed, tools, and linked artifacts.
 
+#### Artifact manifests
+
+Each linked artifact is a reference, not an upload instruction. Producers can
+include a `manifest_version`, `media_type`, `size_bytes`, and an explicit
+`checksum_algorithm`/`checksum` pair. SHA-256 is the interoperable baseline;
+the legacy `sha256` field remains valid for v0.1 records. Consumers should
+resolve URIs according to their own trust and access policy, verify the digest
+before use, and never assume that a reachable URI is immutable. MyelinMesh
+does not fetch, copy, or execute referenced content.
+
 ### Observations
 
 Stores structured measurements. Values should be factual outputs rather than interpretations when possible.

@@ -2,7 +2,34 @@
   "$defs": {
     "ArtifactReference": {
       "additionalProperties": false,
+      "description": "A portable pointer to an immutable evidence artifact.\n\n``sha256`` remains supported for MER v0.1 producers. New producers should\nuse the explicit manifest fields so consumers can negotiate algorithms.\nMyelinMesh records references only; it never fetches or uploads the URI.",
       "properties": {
+        "checksum": {
+          "anyOf": [
+            {
+              "pattern": "^[a-fA-F0-9]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checksum"
+        },
+        "checksum_algorithm": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z0-9][a-z0-9._-]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checksum Algorithm"
+        },
         "description": {
           "anyOf": [
             {
@@ -14,6 +41,12 @@
           ],
           "default": null,
           "title": "Description"
+        },
+        "manifest_version": {
+          "default": "1.0.0",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "title": "Manifest Version",
+          "type": "string"
         },
         "media_type": {
           "anyOf": [

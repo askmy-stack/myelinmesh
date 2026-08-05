@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 class StrictModel(BaseModel):
@@ -37,11 +37,47 @@ class Severity(StrEnum):
 
 
 class ArtifactReference(StrictModel):
+    """A portable pointer to an immutable evidence artifact.
+
+    ``sha256`` remains supported for MER v0.1 producers. New producers should
+    use the explicit manifest fields so consumers can negotiate algorithms.
+    MyelinMesh records references only; it never fetches or uploads the URI.
+    """
+
     uri: str
     media_type: str | None = None
     sha256: str | None = Field(default=None, pattern=r"^[a-fA-F0-9]{64}$")
     description: str | None = None
     size_bytes: int | None = Field(default=None, ge=0)
+    manifest_version: str = Field(default="1.0.0", pattern=r"^\d+\.\d+\.\d+$")
+    checksum_algorithm: str | None = Field(default=None, pattern=r"^[a-z0-9][a-z0-9._-]*$")
+    checksum: str | None = Field(default=None, pattern=r"^[a-fA-F0-9]+$")
+
+    @model_validator(mode="after")
+    def validate_checksum_manifest(self) -> ArtifactReference:
+        if self.checksum is not None and self.checksum_algorithm is None:
+            raise ValueError("checksum_algorithm is required when checksum is set")
+        if self.sha256 is not None:
+            if self.checksum_algorithm not in (None, "sha256"):
+                raise ValueError("legacy sha256 cannot be combined with another algorithm")
+            if self.checksum is not None and self.checksum.lower() != self.sha256.lower():
+                raise ValueError("sha256 and checksum must match when both are provided")
+        if (
+            self.checksum_algorithm == "sha256"
+            and self.checksum is not None
+            and len(self.checksum) != 64
+        ):
+            raise ValueError("sha256 checksum must contain 64 hexadecimal characters")
+        return self
+
+    @property
+    def canonical_checksum(self) -> tuple[str, str] | None:
+        """Return the algorithm and digest using the legacy field when needed."""
+        if self.checksum is not None and self.checksum_algorithm is not None:
+            return self.checksum_algorithm, self.checksum.lower()
+        if self.sha256 is not None:
+            return "sha256", self.sha256.lower()
+        return None
 
 
 class Identity(StrictModel):
