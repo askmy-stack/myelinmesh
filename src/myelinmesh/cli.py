@@ -88,6 +88,47 @@ def ingest(
     )
 
 
+def _expand_batch_paths(paths: list[Path]) -> list[Path]:
+    expanded: set[Path] = set()
+    for path in paths:
+        if path.is_file():
+            expanded.add(path)
+        elif path.is_dir():
+            expanded.update(
+                candidate for candidate in path.rglob("*.mer.json") if candidate.is_file()
+            )
+        else:
+            raise typer.BadParameter(f"Path does not exist: {path}")
+    return sorted(expanded, key=lambda item: str(item))
+
+
+@app.command("ingest-batch")
+def ingest_batch(
+    paths: Annotated[list[Path], typer.Argument(min=1, help="MER files or directories to ingest.")],
+    store_path: Annotated[Path, typer.Option("--store", envvar="MYELINMESH_STORE")] = Path(
+        ".myelinmesh"
+    ),
+    replace: Annotated[
+        bool, typer.Option(help="Replace records with the same evidence id.")
+    ] = False,
+    json_output: Annotated[
+        bool, typer.Option("--json", help="Emit a machine-readable summary.")
+    ] = False,
+) -> None:
+    files = _expand_batch_paths(paths)
+    report = EvidenceStore(store_path).ingest_many(files, replace=replace)
+    if json_output:
+        console.print_json(json.dumps(report.as_dict()))
+    else:
+        console.print(
+            "Batch ingestion: "
+            f"{report.inserted} inserted, {report.duplicates} duplicates, "
+            f"{report.invalid} invalid, {report.failed} failed"
+        )
+    if report.invalid or report.failed:
+        raise typer.Exit(code=2)
+
+
 @app.command()
 def adapt(
     producer: Annotated[

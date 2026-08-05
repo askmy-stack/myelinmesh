@@ -3,7 +3,7 @@ from __future__ import annotations
 import builtins
 import json
 import sqlite3
-from collections.abc import Iterator
+from collections.abc import Iterable, Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
@@ -43,6 +43,24 @@ class EvidenceSummary:
     failure_class: str | None
     severity: str | None
     content_hash: str
+
+
+@dataclass(frozen=True)
+class BatchIngestReport:
+    inserted: int
+    duplicates: int
+    invalid: int
+    failed: int
+    results: tuple[dict[str, str], ...]
+
+    def as_dict(self) -> dict[str, object]:
+        return {
+            "inserted": self.inserted,
+            "duplicates": self.duplicates,
+            "invalid": self.invalid,
+            "failed": self.failed,
+            "results": list(self.results),
+        }
 
 
 class EvidenceStore:
@@ -105,6 +123,80 @@ class EvidenceStore:
                 ),
             )
         return normalized
+
+    def ingest_many(
+        self,
+        paths: Iterable[Path],
+        *,
+        replace: bool = False,
+    ) -> BatchIngestReport:
+        """Ingest records in deterministic path order with per-file outcomes."""
+        self.initialize()
+        inserted = 0
+        duplicates = 0
+        invalid = 0
+        failed = 0
+        results: list[dict[str, str]] = []
+
+        for path in sorted({Path(path) for path in paths}, key=lambda item: str(item)):
+            path_label = str(path)
+            try:
+                record = read_record(path)
+            except ValueError as exc:
+                invalid += 1
+                results.append({"path": path_label, "status": "invalid", "error": str(exc)})
+                continue
+
+            normalized = with_content_hash(record)
+            record_path = self.records_dir / f"{normalized.identity.evidence_id}.mer.json"
+            if record_path.exists() and not replace:
+                existing = read_record(record_path)
+                if existing.content_hash == normalized.content_hash:
+                    duplicates += 1
+                    results.append({"path": path_label, "status": "duplicate"})
+                else:
+                    failed += 1
+                    results.append(
+                        {
+                            "path": path_label,
+                            "status": "failed",
+                            "error": "evidence id already exists with different content",
+                        }
+                    )
+                continue
+
+            with self._connect() as connection:
+                existing_hash = connection.execute(
+                    "SELECT evidence_id FROM evidence WHERE content_hash = ? LIMIT 1",
+                    (normalized.content_hash,),
+                ).fetchone()
+            if existing_hash is not None and not replace:
+                duplicates += 1
+                results.append(
+                    {
+                        "path": path_label,
+                        "status": "duplicate",
+                        "existing_evidence_id": str(existing_hash[0]),
+                    }
+                )
+                continue
+
+            try:
+                self.ingest(normalized, replace=replace)
+            except (OSError, sqlite3.Error, FileExistsError) as exc:
+                failed += 1
+                results.append({"path": path_label, "status": "failed", "error": str(exc)})
+                continue
+            inserted += 1
+            results.append(
+                {
+                    "path": path_label,
+                    "status": "inserted",
+                    "evidence_id": normalized.identity.evidence_id,
+                }
+            )
+
+        return BatchIngestReport(inserted, duplicates, invalid, failed, tuple(results))
 
     def get(self, evidence_id: str) -> EvidenceRecord:
         self.initialize()
