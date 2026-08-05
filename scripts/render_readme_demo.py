@@ -51,6 +51,7 @@ CARD_TITLE = _font(38)
 BODY = _font(30)
 SMALL = _font(30)
 MONO = _font(30, mono=True)
+BADGE = _font(24, mono=True)
 
 
 def _card(
@@ -89,10 +90,16 @@ def _stage_heading(
     *,
     active: bool,
     accent: str,
+    pulse: float | None = None,
 ) -> None:
     color = accent if active else SUBTLE
     draw.text((x, 245), number, font=EYEBROW, fill=color)
     draw.text((x + 62, 245), label, font=EYEBROW, fill=color)
+    rail_start = x
+    rail_end = x + 340
+    draw.line((rail_start, 286, rail_end, 286), fill=color if active else RULE, width=4)
+    marker_x = rail_end if pulse is None else int(rail_start + ((rail_end - rail_start) * pulse))
+    draw.ellipse((marker_x - 6, 280, marker_x + 6, 292), fill=color if active else RULE)
 
 
 def _source_card(
@@ -109,28 +116,68 @@ def _source_card(
     draw.text((98, y + 72), detail, font=SMALL, fill=MUTED if active else SUBTLE)
 
 
-def _render(active_stage: str | None) -> Image.Image:
+def _render(active_stage: str | None, *, pulse: float | None = None) -> Image.Image:
     image = Image.new("RGB", (WIDTH, HEIGHT), BACKGROUND)
     draw = ImageDraw.Draw(image)
     draw.rounded_rectangle((24, 24, WIDTH - 24, HEIGHT - 24), radius=36, fill=SURFACE)
 
+    # A restrained grid gives the frame depth while keeping the text layer clean.
+    for x in range(120, WIDTH - 80, 120):
+        draw.line((x, 210, x, 754), fill="#102138", width=1)
+    for y in range(220, 760, 90):
+        draw.line((72, y, WIDTH - 72, y), fill="#102138", width=1)
+
     draw.text((72, 72), "MyelinMesh", font=TITLE, fill=TEXT)
     draw.text((72, 148), "Reliability evidence, connected.", font=SUBTITLE, fill=MUTED)
-    draw.rounded_rectangle((1315, 78, 1598, 136), radius=18, fill=CARD, outline=RULE, width=2)
-    draw.text((1456, 107), "v0.1 · LOCAL-FIRST", font=EYEBROW, fill=GREEN, anchor="mm")
+    # Keep the status badge in its own generous inset so it never crowds the title.
+    draw.rounded_rectangle((1238, 70, 1608, 144), radius=24, fill=CARD, outline=RULE, width=2)
+    draw.ellipse((1262, 96, 1282, 116), fill=GREEN)
+    draw.text((1304, 106), "v0.1  ·  LOCAL-FIRST", font=BADGE, fill=GREEN, anchor="lm")
 
     source_active = active_stage in (None, "sources")
     normalize_active = active_stage in (None, "normalize")
     store_active = active_stage in (None, "store")
     retrieve_active = active_stage in (None, "retrieve")
 
-    _stage_heading(draw, 72, "SUPPORTED INPUTS", "01", active=source_active, accent=CYAN)
-    _stage_heading(draw, 472, "NORMALIZE", "02", active=normalize_active, accent=VIOLET)
-    _stage_heading(draw, 872, "LOCAL STORE", "03", active=store_active, accent=GREEN)
-    _stage_heading(draw, 1252, "RETRIEVE", "04", active=retrieve_active, accent=YELLOW)
+    _stage_heading(
+        draw,
+        72,
+        "SUPPORTED INPUTS",
+        "01",
+        active=source_active,
+        accent=CYAN,
+        pulse=pulse if active_stage == "sources" else None,
+    )
+    _stage_heading(
+        draw,
+        472,
+        "NORMALIZE",
+        "02",
+        active=normalize_active,
+        accent=VIOLET,
+        pulse=pulse if active_stage == "normalize" else None,
+    )
+    _stage_heading(
+        draw,
+        872,
+        "LOCAL STORE",
+        "03",
+        active=store_active,
+        accent=GREEN,
+        pulse=pulse if active_stage == "store" else None,
+    )
+    _stage_heading(
+        draw,
+        1252,
+        "RETRIEVE",
+        "04",
+        active=retrieve_active,
+        accent=YELLOW,
+        pulse=pulse if active_stage == "retrieve" else None,
+    )
 
     _source_card(draw, 320, "Tool-Semantics", "tool changes", active=source_active)
-    _source_card(draw, 462, "ImpactForge", "simulation tests", active=source_active)
+    _source_card(draw, 462, "MyelinMesh", "evidence runs", active=source_active)
     _source_card(draw, 604, "Parallax", "runtime incidents", active=source_active)
 
     normalize_box = (472, 320, 812, 722)
@@ -197,7 +244,8 @@ def _render(active_stage: str | None) -> Image.Image:
 
 def main() -> None:
     ASSET_DIR.mkdir(parents=True, exist_ok=True)
-    frames = [_render(stage) for stage in STAGES]
+    animation = [(stage, pulse) for stage in STAGES for pulse in (0.12, 0.82)]
+    frames = [_render(stage, pulse=pulse) for stage, pulse in animation]
     overview = _render(None)
     frames.append(overview)
 
@@ -211,7 +259,7 @@ def main() -> None:
         gif_path,
         save_all=True,
         append_images=paletted[1:],
-        duration=[1100, 1200, 1200, 1200, 1900],
+        duration=[650] * 8 + [1900],
         loop=0,
         optimize=True,
         disposal=2,

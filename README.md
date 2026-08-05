@@ -13,7 +13,7 @@ The name draws from biological **myelin**, which insulates and accelerates signa
 
 <picture>
   <source media="(prefers-reduced-motion: reduce)" srcset="docs/assets/myelinmesh-evidence-flow-static.png">
-  <img src="docs/assets/myelinmesh-evidence-flow.gif" alt="MyelinMesh evidence flow: Tool-Semantics, ImpactForge, and Parallax reports pass through adapters, schema validation, and canonical hashing into MER JSON records and a SQLite metadata index, then become available through CLI list, show, search, and stats commands" width="840">
+  <img src="docs/assets/myelinmesh-evidence-flow.gif" alt="MyelinMesh evidence flow: Tool-Semantics, MyelinMesh, and Parallax reports pass through adapters, schema validation, and canonical hashing into MER JSON records and a SQLite metadata index, then become available through CLI list, show, search, and stats commands" width="840">
 </picture>
 
 <p align="center"><em>Supported v0.1 path: reports → validated MER → local JSON/SQLite → CLI.</em></p>
@@ -21,7 +21,7 @@ The name draws from biological **myelin**, which insulates and accelerates signa
 <details>
 <summary>Text version of the evidence flow</summary>
 
-1. Tool-Semantics, ImpactForge, and Parallax reports enter through their supported adapters.
+1. Tool-Semantics, MyelinMesh, and Parallax reports enter through their supported adapters.
 2. Pydantic and JSON Schema validate each MyelinMesh Evidence Record (MER).
 3. Canonical JSON produces a SHA-256 content hash.
 4. MER JSON files and SQLite metadata are written under `.myelinmesh/`.
@@ -43,7 +43,7 @@ MyelinMesh gives these artifacts a shared record format and a local-first store 
 
 ```text
 Tool-Semantics ─┐
-ImpactForge ─────┼──► validate + hash ─► MER JSON + SQLite ─► list · show · search · stats
+MyelinMesh ─────┼──► validate + hash ─► MER JSON + SQLite ─► list · show · search · stats
 Parallax ────────┘
 ```
 
@@ -53,7 +53,7 @@ Parallax ────────┘
 - Deterministic validation and content hashing.
 - Local evidence store backed by JSON files and SQLite metadata.
 - CLI for initialization, validation, ingestion, search, inspection, and statistics.
-- Adapters for Tool-Semantics, ImpactForge, and Parallax-style outputs.
+- Adapters for Tool-Semantics, MyelinMesh, and Parallax-style outputs.
 - Example records covering tool drift, physical regression, and runtime recovery.
 - JSON Schema export for non-Python producers.
 
@@ -132,7 +132,7 @@ The demo creates an isolated `.myelinmesh-demo` store, ingests all three include
 
 ```text
 Producers
-  GitHub · Tool-Semantics · ImpactForge · Parallax · ROS 2 · OTel
+  GitHub · Tool-Semantics · MyelinMesh · Parallax · ROS 2 · OTel
                                 │
                                 ▼
                      Adapter and validation layer
@@ -154,7 +154,7 @@ See [docs/architecture.md](docs/architecture.md) and [docs/evidence-model.md](do
 ## Relationship to the existing projects
 
 - **Tool-Semantics** produces evidence about tool schemas, descriptions, selection behavior, side effects, and compatibility risk.
-- **ImpactForge** produces evidence about change impact, selected physical tests, simulation metrics, and release decisions.
+- **MyelinMesh** produces evidence about change impact, selected physical tests, simulation metrics, and release decisions.
 - **Parallax** produces semantic traces, early warnings, diagnoses, recovery attempts, and post-recovery outcomes.
 - **MyelinMesh** connects those records without replacing the source systems.
 

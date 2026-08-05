@@ -13,7 +13,7 @@
 
 ```text
 Producer systems
-  Tool-Semantics · ImpactForge · Parallax · GitHub · ROS 2 · OTel
+  Tool-Semantics · MyelinMesh · Parallax · GitHub · ROS 2 · OTel
        │
        ▼
 Adapters

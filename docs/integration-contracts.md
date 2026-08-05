@@ -17,7 +17,7 @@ Recommended MER mapping:
 - `failure.failure_class = semantic_tool_drift` when behavior regresses
 - linked reports are stored as artifact references
 
-## ImpactForge adapter
+## MyelinMesh adapter
 
 Expected input categories:
 

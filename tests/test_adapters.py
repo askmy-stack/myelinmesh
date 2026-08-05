@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from myelinmesh.adapters import ImpactForgeAdapter, ParallaxAdapter, ToolSemanticsAdapter
+from myelinmesh.adapters import MyelinMeshAdapter, ParallaxAdapter, ToolSemanticsAdapter
 
 
 def load(name: str) -> dict[str, object]:
@@ -18,9 +18,9 @@ def test_tool_semantics_adapter() -> None:
     assert record.failure is not None and record.failure.detected
 
 
-def test_impactforge_adapter() -> None:
-    adapter = ImpactForgeAdapter()
-    payload = load("impactforge-report.json")
+def test_myelinmesh_adapter() -> None:
+    adapter = MyelinMeshAdapter()
+    payload = load("myelinmesh-report.json")
     assert adapter.can_handle(payload)
     record = adapter.convert(payload)[0]
     assert record.context.domain.value == "physical_ai"
