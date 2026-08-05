@@ -1,6 +1,10 @@
 # Roadmap
 
-## Milestone 0 — Foundation
+Current release track: **v0.2.0 — Interoperability**. The v0.1.0 foundation
+and the first compatibility, batch-ingestion, and migration slices are landed;
+the remaining v0.2 work is tracked in GitHub milestone issues.
+
+## v0.1.0 — Foundation
 
 - [x] Project charter and architecture
 - [x] MER v0.1 schema
@@ -11,18 +15,18 @@
 - [x] Initial adapters and examples
 - [x] CI, contribution, security, governance, and research documents
 
-## Milestone 1 — Interoperability
+## v0.2.0 — Interoperability
 
-- [ ] Formal schema compatibility policy
-- [ ] Schema migration command
+- [x] Formal schema compatibility policy
+- [x] Schema migration command
 - [ ] OpenTelemetry trace adapter
 - [ ] GitHub change and pull-request adapter
 - [ ] ROS 2/MCAP metadata adapter
 - [ ] Artifact manifests with checksums and media types
-- [ ] Batch ingestion and deduplication
+- [x] Batch ingestion and deduplication
 - [ ] Signed provenance envelopes
 
-## Milestone 2 — Evidence retrieval
+## v0.3.0 — Evidence retrieval
 
 - [ ] Structured filters for versions, systems, failure classes, and domains
 - [ ] Optional PostgreSQL backend
@@ -32,7 +36,7 @@
 - [ ] Evidence freshness and decay policies
 - [ ] Minimal web explorer
 
-## Milestone 3 — Project integrations
+## v0.4.0 — Project integrations
 
 - [ ] Tool-Semantics usage-weighted change risk
 - [ ] MyelinMesh history-aware scenario ranking
@@ -40,7 +44,7 @@
 - [ ] Bidirectional links from source reports to MER records
 - [ ] Shared GitHub Action for publishing evidence
 
-## Milestone 4 — Open reliability corpus
+## v0.5.0 — Open reliability corpus
 
 - [ ] Public dataset contribution specification
 - [ ] Synthetic and real evidence labels
@@ -49,7 +53,7 @@
 - [ ] Dataset snapshots on object storage and Hugging Face
 - [ ] Benchmark splits that prevent incident leakage
 
-## Milestone 5 — Active evidence acquisition
+## v0.6.0 — Active evidence acquisition
 
 - [ ] Information-gain test recommendations
 - [ ] Hypothesis-separating experiment selection
