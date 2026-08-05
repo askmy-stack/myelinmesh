@@ -61,7 +61,7 @@ make demo
 3. Add OpenTelemetry JSON export ingestion.
 4. Add GitHub pull-request change evidence ingestion.
 5. Add artifact checksum verification.
-6. Build the first history-aware ImpactForge benchmark fixture.
+6. Build the first history-aware MyelinMesh benchmark fixture.
 7. Build usage-weighted Tool-Semantics severity fixtures.
 8. Build Parallax incident-retrieval benchmark fixtures.
 

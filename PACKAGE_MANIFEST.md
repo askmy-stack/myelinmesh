@@ -24,7 +24,7 @@
 - MER Pydantic model
 - Canonical hashing and validation
 - JSON + SQLite local evidence store
-- Tool-Semantics, ImpactForge, and Parallax adapters
+- Tool-Semantics, MyelinMesh, and Parallax adapters
 - Typer/Rich command-line interface
 - Generated JSON Schema under `schemas/`
 - Example evidence and producer reports under `examples/`

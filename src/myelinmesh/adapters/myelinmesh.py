@@ -15,14 +15,14 @@ from myelinmesh.models import (
 )
 
 
-class ImpactForgeAdapter:
-    name = "impactforge"
+class MyelinMeshAdapter:
+    name = "myelinmesh"
 
     def can_handle(self, payload: dict[str, object]) -> bool:
         return (
             "scenario" in payload
             and "metrics" in payload
-            and ("release_decision" in payload or payload.get("producer") == "impactforge")
+            and ("release_decision" in payload or payload.get("producer") == "myelinmesh")
         )
 
     def convert(self, payload: dict[str, object]) -> list[EvidenceRecord]:
@@ -31,13 +31,13 @@ class ImpactForgeAdapter:
         return [
             EvidenceRecord(
                 identity=Identity(
-                    evidence_id=str(payload.get("evidence_id", "impactforge-import")),
-                    project="impactforge",
+                    evidence_id=str(payload.get("evidence_id", "myelinmesh-import")),
+                    project="myelinmesh",
                     captured_at=captured_at(payload),
                 ),
                 provenance=Provenance(
                     source_type=SourceType.SIMULATION,
-                    producer="impactforge",
+                    producer="myelinmesh",
                     producer_version=str(payload.get("version", "unknown")),
                 ),
                 context=Context(
@@ -61,6 +61,6 @@ class ImpactForgeAdapter:
                     severity=Severity.CRITICAL if failed else Severity.INFO,
                 ),
                 validation=ValidationEvidence(real_or_synthetic=SourceType.SIMULATION),
-                tags=["impactforge", "physical-ai", "adapter-import"],
+                tags=["myelinmesh", "physical-ai", "adapter-import"],
             )
         ]

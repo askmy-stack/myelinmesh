@@ -35,7 +35,7 @@
 ## Milestone 3 — Project integrations
 
 - [ ] Tool-Semantics usage-weighted change risk
-- [ ] ImpactForge history-aware scenario ranking
+- [ ] MyelinMesh history-aware scenario ranking
 - [ ] Parallax similar-incident and recovery retrieval
 - [ ] Bidirectional links from source reports to MER records
 - [ ] Shared GitHub Action for publishing evidence
