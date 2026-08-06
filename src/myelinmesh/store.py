@@ -24,11 +24,16 @@ CREATE TABLE IF NOT EXISTS evidence (
     severity TEXT,
     content_hash TEXT NOT NULL,
     path TEXT NOT NULL,
-    searchable_text TEXT NOT NULL
+    searchable_text TEXT NOT NULL,
+    schema_version TEXT NOT NULL DEFAULT '0.1.0',
+    tags TEXT NOT NULL DEFAULT '[]'
 );
 CREATE INDEX IF NOT EXISTS idx_evidence_project ON evidence(project);
 CREATE INDEX IF NOT EXISTS idx_evidence_domain ON evidence(domain);
 CREATE INDEX IF NOT EXISTS idx_evidence_failure ON evidence(failure_class);
+CREATE INDEX IF NOT EXISTS idx_evidence_schema_version ON evidence(schema_version);
+CREATE INDEX IF NOT EXISTS idx_evidence_system ON evidence(system);
+CREATE INDEX IF NOT EXISTS idx_evidence_tags ON evidence(tags);
 """
 
 
@@ -43,6 +48,17 @@ class EvidenceSummary:
     failure_class: str | None
     severity: str | None
     content_hash: str
+
+
+@dataclass(frozen=True)
+class EvidenceFilters:
+    """Composable exact-match filters for deterministic evidence retrieval."""
+
+    schema_version: str | None = None
+    system: str | None = None
+    domain: str | None = None
+    failure_class: str | None = None
+    tags: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -73,6 +89,20 @@ class EvidenceStore:
         self.records_dir.mkdir(parents=True, exist_ok=True)
         with self._connect() as connection:
             connection.executescript(SCHEMA)
+            columns = {str(row[1]) for row in connection.execute("PRAGMA table_info(evidence)")}
+            if "schema_version" not in columns:
+                connection.execute(
+                    "ALTER TABLE evidence ADD COLUMN schema_version TEXT NOT NULL DEFAULT '0.1.0'"
+                )
+            if "tags" not in columns:
+                connection.execute(
+                    "ALTER TABLE evidence ADD COLUMN tags TEXT NOT NULL DEFAULT '[]'"
+                )
+            connection.execute(
+                "CREATE INDEX IF NOT EXISTS idx_evidence_schema_version ON evidence(schema_version)"
+            )
+            connection.execute("CREATE INDEX IF NOT EXISTS idx_evidence_system ON evidence(system)")
+            connection.execute("CREATE INDEX IF NOT EXISTS idx_evidence_tags ON evidence(tags)")
         manifest = self.root / "store.json"
         if not manifest.exists():
             manifest.write_text(
@@ -105,8 +135,9 @@ class EvidenceStore:
                 f"""
                 {statement} INTO evidence (
                     evidence_id, project, captured_at, source_type, domain, system,
-                    failure_class, severity, content_hash, path, searchable_text
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    failure_class, severity, content_hash, path, searchable_text,
+                    schema_version, tags
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     normalized.identity.evidence_id,
@@ -120,6 +151,8 @@ class EvidenceStore:
                     normalized.content_hash,
                     str(record_path.relative_to(self.root)),
                     searchable,
+                    normalized.schema_version,
+                    json.dumps(normalized.tags, ensure_ascii=False),
                 ),
             )
         return normalized
@@ -237,6 +270,41 @@ class EvidenceStore:
                 FROM evidence
                 WHERE {predicates}
                 ORDER BY captured_at DESC LIMIT ?
+                """,
+                parameters,
+            ).fetchall()
+        return [EvidenceSummary(*row) for row in rows]
+
+    def filter(
+        self, filters: EvidenceFilters, *, limit: int = 100
+    ) -> builtins.list[EvidenceSummary]:
+        """Apply all supplied filters using indexed metadata and exact tags."""
+        self.initialize()
+        predicates: list[str] = []
+        parameters: builtins.list[object] = []
+        for column, value in (
+            ("schema_version", filters.schema_version),
+            ("system", filters.system),
+            ("domain", filters.domain),
+            ("failure_class", filters.failure_class),
+        ):
+            if value is not None:
+                predicates.append(f"e.{column} = ?")
+                parameters.append(value)
+        for tag in filters.tags:
+            predicates.append(
+                "EXISTS (SELECT 1 FROM json_each(e.tags) WHERE lower(json_each.value) = lower(?))"
+            )
+            parameters.append(tag)
+        where = " AND ".join(predicates) or "1 = 1"
+        parameters.append(limit)
+        with self._connect() as connection:
+            rows = connection.execute(
+                f"""
+                SELECT e.evidence_id, e.project, e.captured_at, e.source_type, e.domain,
+                       e.system, e.failure_class, e.severity, e.content_hash
+                FROM evidence AS e WHERE {where}
+                ORDER BY e.captured_at DESC, e.evidence_id ASC LIMIT ?
                 """,
                 parameters,
             ).fetchall()

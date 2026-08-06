@@ -25,6 +25,13 @@ def test_cli_workflow(tmp_path: Path) -> None:
     assert search_result.exit_code == 0
     assert "mer-demo-tool-drift-001" in search_result.stdout
 
+    filtered = runner.invoke(
+        app,
+        ["filter", "--domain", "agent", "--tag", "tool-semantics", "--store", str(store)],
+    )
+    assert filtered.exit_code == 0
+    assert "mer-demo-tool-drift-001" in filtered.stdout
+
 
 def test_cli_adapter(tmp_path: Path) -> None:
     output = tmp_path / "converted"
