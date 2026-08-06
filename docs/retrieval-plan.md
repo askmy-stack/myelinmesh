@@ -16,3 +16,8 @@ The dependency order is:
 
 Every slice must preserve the local-first default, deterministic results,
 content-hash integrity, and the rule that evidence retrieval is not proof.
+
+Issue #34 is implemented by `EvidenceStore.filter()` and the CLI
+`myelinmesh filter` command. Filters are exact-match and composable; repeated
+`--tag` options require every requested tag. Empty filters return the newest
+records deterministically.
