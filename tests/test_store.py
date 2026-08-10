@@ -79,3 +79,20 @@ def test_batch_ingest_reports_invalid_and_conflicting_records(tmp_path: Path) ->
     assert report.duplicates == 1
     assert report.invalid == 1
     assert report.failed == 1
+
+
+def test_store_audit_reports_contradiction_without_mutating_records(tmp_path: Path) -> None:
+    store = EvidenceStore(tmp_path / "store")
+    record = read_record(Path("examples/records/tool-semantic-drift.mer.json"))
+    assert record.failure is not None
+    opposite = record.model_copy(
+        update={
+            "identity": record.identity.model_copy(update={"evidence_id": "tool-drift-opposite"}),
+            "failure": record.failure.model_copy(update={"detected": False}),
+        }
+    )
+    store.ingest(record)
+    store.ingest(opposite)
+    report = store.audit_consistency()
+    assert len(report.contradictions) == 1
+    assert store.stats()["total"] == 2
