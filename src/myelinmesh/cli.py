@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import asdict
 from pathlib import Path
 from typing import Annotated
 
@@ -21,7 +22,7 @@ from myelinmesh.adapters.base import EvidenceAdapter
 from myelinmesh.hashing import compute_content_hash, verify_content_hash
 from myelinmesh.io import EvidenceFileError, read_record, write_record
 from myelinmesh.migrations import MigrationError, migrate_record
-from myelinmesh.store import EvidenceFilters, EvidenceStore, EvidenceSummary
+from myelinmesh.store import ApplicabilityFilters, EvidenceFilters, EvidenceStore, EvidenceSummary
 
 app = typer.Typer(
     name="myelinmesh",
@@ -288,6 +289,53 @@ def filter_records(
         limit=limit,
     )
     _render_summaries(results)
+
+
+@app.command("applicable")
+def applicable_records(
+    domain: Annotated[str | None, typer.Option("--domain")] = None,
+    system: Annotated[str | None, typer.Option("--system")] = None,
+    producer_version: Annotated[str | None, typer.Option("--version")] = None,
+    preconditions: Annotated[
+        list[str] | None,
+        typer.Option("--precondition", help="Required condition as key=value; repeatable."),
+    ] = None,
+    store_path: Annotated[Path, typer.Option("--store", envvar="MYELINMESH_STORE")] = Path(
+        ".myelinmesh"
+    ),
+    limit: Annotated[int, typer.Option(min=1, max=10000)] = 100,
+) -> None:
+    """Filter by applicability and explain exclusions before ranking."""
+    parsed: list[tuple[str, str]] = []
+    for item in preconditions or []:
+        if "=" not in item:
+            raise typer.BadParameter(
+                "Preconditions must use key=value.", param_hint="--precondition"
+            )
+        key, value = item.split("=", 1)
+        if not key:
+            raise typer.BadParameter(
+                "Precondition keys must not be empty.", param_hint="--precondition"
+            )
+        parsed.append((key, value))
+    result = EvidenceStore(store_path).applicable(
+        ApplicabilityFilters(
+            domain=domain,
+            system=system,
+            producer_version=producer_version,
+            preconditions=tuple(parsed),
+        ),
+        limit=limit,
+    )
+    console.print_json(
+        json.dumps(
+            {
+                "included": [asdict(item) for item in result.included],
+                "excluded": [asdict(item) for item in result.excluded],
+            },
+            default=str,
+        )
+    )
 
 
 @app.command()

@@ -62,6 +62,28 @@ class EvidenceFilters:
 
 
 @dataclass(frozen=True)
+class ApplicabilityFilters:
+    """Context constraints evaluated before similarity or ranking."""
+
+    domain: str | None = None
+    system: str | None = None
+    producer_version: str | None = None
+    preconditions: tuple[tuple[str, str], ...] = ()
+
+
+@dataclass(frozen=True)
+class ApplicabilityExclusion:
+    evidence_id: str
+    reasons: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class ApplicabilityResult:
+    included: tuple[EvidenceSummary, ...]
+    excluded: tuple[ApplicabilityExclusion, ...]
+
+
+@dataclass(frozen=True)
 class BatchIngestReport:
     inserted: int
     duplicates: int
@@ -309,6 +331,41 @@ class EvidenceStore:
                 parameters,
             ).fetchall()
         return [EvidenceSummary(*row) for row in rows]
+
+    def applicable(self, filters: ApplicabilityFilters, *, limit: int = 100) -> ApplicabilityResult:
+        """Return applicable records and explain every pre-ranking exclusion."""
+        candidates = self.filter(
+            EvidenceFilters(domain=filters.domain, system=filters.system),
+            limit=1_000_000,
+        )
+        included: list[EvidenceSummary] = []
+        excluded: list[ApplicabilityExclusion] = []
+        required = dict(filters.preconditions)
+        for summary in candidates:
+            record = self.get(summary.evidence_id)
+            reasons: list[str] = []
+            if (
+                filters.producer_version is not None
+                and record.provenance.producer_version != filters.producer_version
+            ):
+                reasons.append(
+                    "producer_version mismatch "
+                    f"(required {filters.producer_version!r}, "
+                    f"recorded {record.provenance.producer_version!r})"
+                )
+            available = record.recovery.applicable_conditions if record.recovery else {}
+            for key, expected in required.items():
+                actual = available.get(key)
+                if actual is None or str(actual) != expected:
+                    reasons.append(
+                        f"precondition {key!r} mismatch "
+                        f"(required {expected!r}, recorded {actual!r})"
+                    )
+            if reasons:
+                excluded.append(ApplicabilityExclusion(summary.evidence_id, tuple(reasons)))
+            elif len(included) < limit:
+                included.append(summary)
+        return ApplicabilityResult(tuple(included), tuple(excluded))
 
     def stats(self) -> dict[str, object]:
         self.initialize()
