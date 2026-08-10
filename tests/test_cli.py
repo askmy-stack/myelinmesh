@@ -25,6 +25,11 @@ def test_cli_workflow(tmp_path: Path) -> None:
     assert search_result.exit_code == 0
     assert "mer-demo-tool-drift-001" in search_result.stdout
 
+    audit_result = runner.invoke(app, ["audit", "--store", str(store)])
+    assert audit_result.exit_code == 0
+    assert '"duplicates": []' in audit_result.stdout
+    assert '"contradictions": []' in audit_result.stdout
+
 
 def test_cli_adapter(tmp_path: Path) -> None:
     output = tmp_path / "converted"

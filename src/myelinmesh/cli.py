@@ -271,3 +271,27 @@ def stats(
     ),
 ) -> None:
     console.print_json(json.dumps(EvidenceStore(store_path).stats()))
+
+
+@app.command("audit")
+def audit(
+    store_path: Annotated[Path, typer.Option("--store", envvar="MYELINMESH_STORE")] = Path(
+        ".myelinmesh"
+    ),
+) -> None:
+    """Report duplicate and contradictory evidence without mutating the store."""
+    report = EvidenceStore(store_path).audit_consistency()
+    console.print_json(
+        json.dumps(
+            {
+                "duplicates": [
+                    {"evidence_ids": finding.evidence_ids, "reason": finding.reason}
+                    for finding in report.duplicates
+                ],
+                "contradictions": [
+                    {"evidence_ids": finding.evidence_ids, "reason": finding.reason}
+                    for finding in report.contradictions
+                ],
+            }
+        )
+    )

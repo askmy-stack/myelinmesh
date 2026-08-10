@@ -16,3 +16,9 @@ The dependency order is:
 
 Every slice must preserve the local-first default, deterministic results,
 content-hash integrity, and the rule that evidence retrieval is not proof.
+
+Issue #38 is implemented as a report-only consistency audit. Duplicate
+payloads are grouped by content hash; contradictions are reported when records
+share a stable claim key but disagree about `failure.detected`. The API is
+`audit_records()`/`EvidenceStore.audit_consistency()`, and the CLI command is
+`myelinmesh audit`. No records are deleted or rewritten.
