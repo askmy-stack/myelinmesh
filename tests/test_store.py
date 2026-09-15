@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from myelinmesh.io import read_record
-from myelinmesh.store import EvidenceStore
+from myelinmesh.store import EvidenceFilters, EvidenceStore
 
 
 def test_ingest_search_and_get(tmp_path: Path) -> None:
@@ -79,3 +79,27 @@ def test_batch_ingest_reports_invalid_and_conflicting_records(tmp_path: Path) ->
     assert report.duplicates == 1
     assert report.invalid == 1
     assert report.failed == 1
+
+
+def test_composable_exact_filters_cover_metadata_and_tags(tmp_path: Path) -> None:
+    store = EvidenceStore(tmp_path / "store")
+    tool = read_record(Path("examples/records/tool-semantic-drift.mer.json"))
+    physical = read_record(Path("examples/records/physical-regression.mer.json"))
+    store.ingest(tool)
+    store.ingest(physical)
+    results = store.filter(
+        EvidenceFilters(
+            schema_version="0.1.0",
+            system=tool.context.system,
+            domain=tool.context.domain.value,
+            tags=("tool-semantics",),
+        )
+    )
+    assert [item.evidence_id for item in results] == [tool.identity.evidence_id]
+
+
+def test_filters_return_all_records_when_empty(tmp_path: Path) -> None:
+    store = EvidenceStore(tmp_path / "store")
+    record = read_record(Path("examples/records/tool-semantic-drift.mer.json"))
+    store.ingest(record)
+    assert len(store.filter(EvidenceFilters())) == 1

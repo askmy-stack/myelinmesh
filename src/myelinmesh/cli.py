@@ -21,7 +21,7 @@ from myelinmesh.adapters.base import EvidenceAdapter
 from myelinmesh.hashing import compute_content_hash, verify_content_hash
 from myelinmesh.io import EvidenceFileError, read_record, write_record
 from myelinmesh.migrations import MigrationError, migrate_record
-from myelinmesh.store import EvidenceStore, EvidenceSummary
+from myelinmesh.store import EvidenceFilters, EvidenceStore, EvidenceSummary
 
 app = typer.Typer(
     name="myelinmesh",
@@ -262,6 +262,32 @@ def search(
     limit: Annotated[int, typer.Option(min=1, max=1000)] = 20,
 ) -> None:
     _render_summaries(EvidenceStore(store_path).search(query, limit=limit))
+
+
+@app.command("filter")
+def filter_records(
+    schema_version: Annotated[str | None, typer.Option("--schema-version")] = None,
+    system: Annotated[str | None, typer.Option("--system")] = None,
+    domain: Annotated[str | None, typer.Option("--domain")] = None,
+    failure_class: Annotated[str | None, typer.Option("--failure-class")] = None,
+    tags: Annotated[list[str] | None, typer.Option("--tag")] = None,
+    store_path: Annotated[Path, typer.Option("--store", envvar="MYELINMESH_STORE")] = Path(
+        ".myelinmesh"
+    ),
+    limit: Annotated[int, typer.Option(min=1, max=10000)] = 100,
+) -> None:
+    """Retrieve records using composable exact-match metadata filters."""
+    results = EvidenceStore(store_path).filter(
+        EvidenceFilters(
+            schema_version=schema_version,
+            system=system,
+            domain=domain,
+            failure_class=failure_class,
+            tags=tuple(tags or ()),
+        ),
+        limit=limit,
+    )
+    _render_summaries(results)
 
 
 @app.command()
