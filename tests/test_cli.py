@@ -32,6 +32,24 @@ def test_cli_workflow(tmp_path: Path) -> None:
     assert filtered.exit_code == 0
     assert "mer-demo-tool-drift-001" in filtered.stdout
 
+    freshness = runner.invoke(
+        app,
+        [
+            "freshness",
+            "--max-age-days",
+            "30",
+            "--half-life-days",
+            "30",
+            "--as-of",
+            "2026-08-11T18:20:00Z",
+            "--store",
+            str(store),
+        ],
+    )
+    assert freshness.exit_code == 0
+    assert '"status": "fresh"' in freshness.stdout
+    assert "mer-demo-tool-drift-001" in freshness.stdout
+
 
 def test_cli_adapter(tmp_path: Path) -> None:
     output = tmp_path / "converted"

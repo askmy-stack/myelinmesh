@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated
 
@@ -18,6 +19,7 @@ from myelinmesh.adapters import (
     ToolSemanticsAdapter,
 )
 from myelinmesh.adapters.base import EvidenceAdapter
+from myelinmesh.freshness import FreshnessPolicy
 from myelinmesh.hashing import compute_content_hash, verify_content_hash
 from myelinmesh.io import EvidenceFileError, read_record, write_record
 from myelinmesh.migrations import MigrationError, migrate_record
@@ -210,12 +212,12 @@ def adapt(
 
 def _render_summaries(rows: list[EvidenceSummary]) -> None:
     table = Table(show_header=True, header_style="bold")
-    table.add_column("Evidence ID")
-    table.add_column("Project")
-    table.add_column("Domain")
-    table.add_column("System")
-    table.add_column("Failure")
-    table.add_column("Severity")
+    table.add_column("Evidence ID", no_wrap=True, overflow="fold")
+    table.add_column("Project", overflow="fold")
+    table.add_column("Domain", overflow="fold")
+    table.add_column("System", overflow="fold")
+    table.add_column("Failure", overflow="fold")
+    table.add_column("Severity", overflow="fold")
     for row in rows:
         table.add_row(
             row.evidence_id,
@@ -297,3 +299,68 @@ def stats(
     ),
 ) -> None:
     console.print_json(json.dumps(EvidenceStore(store_path).stats()))
+
+
+@app.command("freshness")
+def freshness(
+    max_age_days: Annotated[
+        float, typer.Option("--max-age-days", help="Age threshold in days before stale.")
+    ] = 30.0,
+    half_life_days: Annotated[
+        float | None,
+        typer.Option("--half-life-days", help="Optional exponential decay half-life in days."),
+    ] = None,
+    as_of: Annotated[
+        str | None,
+        typer.Option(
+            "--as-of",
+            help="Reference timestamp (ISO-8601, e.g. 2026-08-11T18:20:00Z). Defaults to now UTC.",
+        ),
+    ] = None,
+    store_path: Annotated[Path, typer.Option("--store", envvar="MYELINMESH_STORE")] = Path(
+        ".myelinmesh"
+    ),
+) -> None:
+    """Evaluate freshness and decay weights without mutating stored records."""
+    if as_of is None:
+        reference = datetime.now(UTC)
+    else:
+        try:
+            reference = datetime.fromisoformat(as_of.replace("Z", "+00:00"))
+        except ValueError as exc:
+            raise typer.BadParameter(
+                "Use an ISO-8601 timestamp such as 2026-08-11T18:20:00Z.",
+                param_hint="--as-of",
+            ) from exc
+        if reference.tzinfo is None:
+            reference = reference.replace(tzinfo=UTC)
+    try:
+        policy = FreshnessPolicy(
+            max_age_days=max_age_days,
+            half_life_days=half_life_days,
+            as_of=reference,
+        )
+    except ValueError as exc:
+        raise typer.BadParameter(str(exc)) from exc
+    report = EvidenceStore(store_path).evaluate_freshness(policy)
+    console.print_json(
+        json.dumps(
+            {
+                "policy": {
+                    "max_age_days": policy.max_age_days,
+                    "half_life_days": policy.half_life_days,
+                    "as_of": reference.isoformat(),
+                },
+                "assessments": [
+                    {
+                        "evidence_id": item.evidence_id,
+                        "age_days": item.age_days,
+                        "status": item.status,
+                        "weight": item.weight,
+                        "reasons": list(item.reasons),
+                    }
+                    for item in report.assessments
+                ],
+            }
+        )
+    )

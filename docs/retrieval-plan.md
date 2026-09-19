@@ -21,3 +21,9 @@ Issue #34 is implemented by `EvidenceStore.filter()` and the CLI
 `myelinmesh filter` command. Filters are exact-match and composable; repeated
 `--tag` options require every requested tag. Empty filters return the newest
 records deterministically.
+
+Issue #39 adds configurable freshness windows and optional exponential decay
+weights via `FreshnessPolicy`, `evaluate_record()`/`evaluate_records()`, and
+`EvidenceStore.evaluate_freshness()`. Evaluation is deterministic for a fixed
+`--as-of` timestamp and never mutates stored MER or SQLite rows. The CLI
+command is `myelinmesh freshness`.
