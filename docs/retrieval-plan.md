@@ -21,3 +21,8 @@ Issue #34 is implemented by `EvidenceStore.filter()` and the CLI
 `myelinmesh filter` command. Filters are exact-match and composable; repeated
 `--tag` options require every requested tag. Empty filters return the newest
 records deterministically.
+
+Issue #37 adds `EvidenceStore.applicable()`, which evaluates domain, system,
+producer version, and recovery preconditions before ranking. The result keeps
+included records separate from excluded records and gives each exclusion
+machine-readable reasons. The CLI equivalent is `myelinmesh applicable`.

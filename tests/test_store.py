@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from myelinmesh.io import read_record
-from myelinmesh.store import EvidenceFilters, EvidenceStore
+from myelinmesh.store import ApplicabilityFilters, EvidenceFilters, EvidenceStore
 
 
 def test_ingest_search_and_get(tmp_path: Path) -> None:
@@ -103,3 +103,33 @@ def test_filters_return_all_records_when_empty(tmp_path: Path) -> None:
     record = read_record(Path("examples/records/tool-semantic-drift.mer.json"))
     store.ingest(record)
     assert len(store.filter(EvidenceFilters())) == 1
+
+
+def test_applicability_returns_explainable_exclusions(tmp_path: Path) -> None:
+    store = EvidenceStore(tmp_path / "store")
+    record = read_record(Path("examples/records/tool-semantic-drift.mer.json"))
+    store.ingest(record)
+
+    applicable = store.applicable(
+        ApplicabilityFilters(
+            domain="agent",
+            system="calendar-agent",
+            producer_version="0.1.0",
+            preconditions=(("model", "example-model-v2"),),
+        )
+    )
+    assert [item.evidence_id for item in applicable.included] == [record.identity.evidence_id]
+    assert applicable.excluded == ()
+
+    excluded = store.applicable(
+        ApplicabilityFilters(
+            domain="agent",
+            system="calendar-agent",
+            producer_version="9.9.9",
+            preconditions=(("model", "wrong-model"),),
+        )
+    )
+    assert excluded.included == ()
+    assert len(excluded.excluded) == 1
+    assert "producer_version mismatch" in excluded.excluded[0].reasons[0]
+    assert "precondition 'model' mismatch" in excluded.excluded[0].reasons[1]
