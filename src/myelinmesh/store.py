@@ -8,6 +8,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 
+from myelinmesh.freshness import FreshnessPolicy, FreshnessReport, evaluate_records
 from myelinmesh.hashing import with_content_hash
 from myelinmesh.io import read_record, write_record
 from myelinmesh.models import EvidenceRecord
@@ -332,6 +333,10 @@ class EvidenceStore:
             "domains": dict(domains),
             "failure_classes": dict(failures),
         }
+
+    def evaluate_freshness(self, policy: FreshnessPolicy) -> FreshnessReport:
+        """Apply a freshness policy to stored records without mutating them."""
+        return evaluate_records(self.iter_records(), policy)
 
     def iter_records(self) -> Iterator[EvidenceRecord]:
         for summary in self.list(limit=1_000_000):
