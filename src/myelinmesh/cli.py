@@ -210,12 +210,12 @@ def adapt(
 
 def _render_summaries(rows: list[EvidenceSummary]) -> None:
     table = Table(show_header=True, header_style="bold")
-    table.add_column("Evidence ID")
-    table.add_column("Project")
-    table.add_column("Domain")
-    table.add_column("System")
-    table.add_column("Failure")
-    table.add_column("Severity")
+    table.add_column("Evidence ID", no_wrap=True, overflow="fold")
+    table.add_column("Project", overflow="fold")
+    table.add_column("Domain", overflow="fold")
+    table.add_column("System", overflow="fold")
+    table.add_column("Failure", overflow="fold")
+    table.add_column("Severity", overflow="fold")
     for row in rows:
         table.add_row(
             row.evidence_id,
@@ -297,3 +297,27 @@ def stats(
     ),
 ) -> None:
     console.print_json(json.dumps(EvidenceStore(store_path).stats()))
+
+
+@app.command("audit")
+def audit(
+    store_path: Annotated[Path, typer.Option("--store", envvar="MYELINMESH_STORE")] = Path(
+        ".myelinmesh"
+    ),
+) -> None:
+    """Report duplicate and contradictory evidence without mutating the store."""
+    report = EvidenceStore(store_path).audit_consistency()
+    console.print_json(
+        json.dumps(
+            {
+                "duplicates": [
+                    {"evidence_ids": list(finding.evidence_ids), "reason": finding.reason}
+                    for finding in report.duplicates
+                ],
+                "contradictions": [
+                    {"evidence_ids": list(finding.evidence_ids), "reason": finding.reason}
+                    for finding in report.contradictions
+                ],
+            }
+        )
+    )

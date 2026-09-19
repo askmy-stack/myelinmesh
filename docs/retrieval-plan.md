@@ -21,3 +21,9 @@ Issue #34 is implemented by `EvidenceStore.filter()` and the CLI
 `myelinmesh filter` command. Filters are exact-match and composable; repeated
 `--tag` options require every requested tag. Empty filters return the newest
 records deterministically.
+
+Issue #38 is implemented as a report-only consistency audit. Duplicate
+payloads are grouped by content hash; contradictions are reported when records
+share a stable claim key but disagree about `failure.detected`. The API is
+`audit_records()`/`EvidenceStore.audit_consistency()`, and the CLI command is
+`myelinmesh audit`. No records are deleted or rewritten.
