@@ -47,7 +47,7 @@ docs = [
   "mkdocs-material>=9.5,<10"
 ]
 media = [
-  "Pillow>=12,<13"
+  "Pillow>=12,<14"
 ]
 
 [project.scripts]
